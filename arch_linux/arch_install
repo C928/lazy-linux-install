@@ -1,0 +1,93 @@
+- loadkeys fr
+- timedatectl set-ntp true
+- lsblk
+- cfdisk /dev/nvme0n1 : partition disks
+    128M nvme0n1p1 EFI System
+    remaining space nvme0n1p2 Linux filesystem
+- lsblk
+- mkfs.fat -F32 /dev/nvme0n1p1
+- mkfs.ext4 /dev/nvme0n1p2
+- mount /dev/nvme0n1p2 /mnt
+- mkdir -p /mnt/boot
+- mount /dev/nvme0n1p1 /mnt/boot
+- lsblk
+- pacstrap /mnt base base-devel linux linux-firmware vim
+- genfstab -U /mnt >> /mnt/etc/fstab
+- arch-chroot /mnt /bin/bash
+- pacman -S networkmanager grub efibootmgr
+- systemctl enable NetworkManager
+- grub-install target=x86_64-efi 
+                --efi-directory=/boot 
+                --bootloader-id=grub_uefi 
+                --recheck
+                --removable (might need it depending on the MB model)
+- grub-mkconfig -o /boot/grub/grub.cfg
+- vim /etc/locale.gen
+    #en_US...iso
+    #en_US...
+- vim /etc/locale.conf
+    LANG=en_US.UTF-8
+- ln -sf /usr/share/zoneinfo/Europe/Paris /etc/localtime
+- passwd
+- pacman -S network-manager-applet
+            wireless_tools
+            wpa_supplicant
+            dialog
+            os-prober
+            linux-headers
+            reflector
+            git
+            openssh
+
+# stop here for basic arch install 
+
+- vim /etc/vconsole.conf
+    KEYMAP=fr
+- vim /etc/hostname chungus
+- useradd -mG wheel coco
+- passwd coco
+- EDITOR=vim visudo
+    %wheel ALL=(ALL) ALL
+- git clone https://aur.archlinux.org/yay.git
+- cd yay
+- makepkg -si PKGBUILD
+- exit
+- umount -R /mnt
+- reboot
+- yay -S    xorg 
+            xorg-xinit 
+            i3-wm 
+            i3lock 
+            i3status 
+            i3blocks 
+            i3-gaps
+            dmenu 
+            kitty 
+            firefox
+            chromium
+- sudo cp /etc/X11/xinit/xinitrc ~/.xinitrc
+- ls -a
+- sudo vim .xinitrc
+    delete lines after fi (5 lines)
+    add exec i3
+- sudo setxkbmap fr
+- mkdir -p /home/coco/.config/i3
+- git clone https://github.com/C928/linux-installs
+- cd linux-installs/arch_linux/conf_files
+- cp -r config i3blocks i3status scripts ~/.config/i3
+- cp dotfiles/bashrc ~/.bashrc
+- cp dotfiles/kitty.conf ~/.config/kitty/
+- sudo cp dotfiles/vimrc /etc/vimrc
+- yay -S    thunar 
+            lxappearance
+            arc-gtk-theme 
+            ttf-jetbrains-mono
+            ttf-font-awesome
+            feh
+            rofi
+            wget
+            unzip
+            7-zip
+            nerd-fonts-jetbrains-mono
+            grabc
+            ckb-next

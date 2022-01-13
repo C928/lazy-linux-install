@@ -1,0 +1,55 @@
+#
+# ~/.bashrc
+#
+
+# If not running interactively, don't do anything
+[[ $- != *i* ]] && return
+
+alias ls='ls --color=auto'
+PS1='[\u@\h \W]\$ '
+
+#cmds
+alias \
+	la='ls -A' \
+	ll='ls -laF' \
+	l='ls -CF' \
+	x='xclip -in -selection clipboard' \
+	sdn='shutdown -h now' \
+	untar='tar -zxvf' \
+	myip='curl ipinfo.io/ip' \
+	ka='killall' \
+	cp='cp -iv' \
+	mv='mv -iv' \
+	rm='rm -v' \
+	sha='shasum -a 256' \
+	lm='ls -t -1' \
+	lt='ls --human-readable --size -1 -S --classify' \
+	scs='systemctl suspend' \
+
+#edit 
+alias \
+	i3config='vim ~/.config/i3/config' \
+	bashrc='vim ~/.bashrc' \
+
+#display 
+alias \
+	scut='cat ~/all/scuts-tools/scuts' \
+
+#softwares
+alias \
+        tb='~/src/jetbrains-toolbox' \
+        tor='cd ~/src/tor-browser_en-US && ./start-tor-browser.desktop' \
+
+#cd 
+alias \
+	all='cd ~/all' \
+	dev='cd ~/all/dev' \
+	dl='cd ~/Downloads' \
+	doc='cd ~/Documents' \
+	pict='cd ~/Pictures' \
+	music='cd ~/Music' \
+	desk='cd ~/Desktop' \
+	video='cd ~/Videos' \
+	ctf='cd ~/all/ctf' \
+	rootme='cd ~/all/ctf/root-me' \
+	cf='cd ~/all/cp/codeforces' \

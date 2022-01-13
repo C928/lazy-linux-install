@@ -1,0 +1,7 @@
+set tabstop=4
+set shiftwidth=4
+set tabstop=8 softtabstop=0 expandtab shiftwidth=4 smarttab
+
+" auto complete parentheses
+" inoremap        (  ()<Left>
+" inoremap <expr> )  strpart(getline('.'), col('.')-1, 1) == ")" ? "\<Right>" : ")"
