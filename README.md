@@ -1,2 +1,3 @@
-# my installations of some linux distributions
+# My personnal linux installations
+
 - todo: gentoo :)
