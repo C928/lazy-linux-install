@@ -13,6 +13,7 @@ alias \
 	la='ls -A' \
 	ll='ls -laF' \
 	l='ls -CF' \
+	nh='nohup' \
 	x='xclip -in -selection clipboard' \
 	sdn='shutdown -h now' \
 	untar='tar -zxvf' \
