@@ -8,12 +8,13 @@
 alias ls='ls --color=auto'
 PS1='[\u@\h \W]\$ '
 
+# nh <bin_name> &>/dev/null&
 #cmds
 alias \
 	la='ls -A' \
 	ll='ls -laF' \
 	l='ls -CF' \
-	nh='nohup' \
+        nh='nohup' \
 	x='xclip -in -selection clipboard' \
 	sdn='shutdown -h now' \
 	untar='tar -zxvf' \
@@ -26,6 +27,11 @@ alias \
 	lm='ls -t -1' \
 	lt='ls --human-readable --size -1 -S --classify' \
 	scs='systemctl suspend' \
+
+#infosec
+alias \
+        exiftool='/home/coco/src/exiftool/exiftool' \
+        jython='/home/coco/src/jython2.7.2/jython' \
 
 #edit 
 alias \
@@ -40,6 +46,7 @@ alias \
 alias \
         tb='~/src/jetbrains-toolbox' \
         tor='cd ~/src/tor-browser_en-US && ./start-tor-browser.desktop' \
+        code='~/src/VSCode-linux-x64/code' \
 
 #cd 
 alias \
@@ -52,5 +59,11 @@ alias \
 	desk='cd ~/Desktop' \
 	video='cd ~/Videos' \
 	ctf='cd ~/all/ctf' \
+        bb='cd ~/all/bug_bounty' \
 	rootme='cd ~/all/ctf/root-me' \
 	cf='cd ~/all/cp/codeforces' \
+
+
+# BEGIN_KITTY_SHELL_INTEGRATION
+if test -n "$KITTY_INSTALLATION_DIR" -a -e "$KITTY_INSTALLATION_DIR/shell-integration/bash/kitty.bash"; then source "$KITTY_INSTALLATION_DIR/shell-integration/bash/kitty.bash"; fi
+# END_KITTY_SHELL_INTEGRATION
