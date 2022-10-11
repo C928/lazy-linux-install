@@ -1,0 +1,169 @@
+# ifconfig, ping -c 3 www.gentoo.com
+- loadkeys fr
+- fdisk /dev/nvme0n1
+p: list disk partitions
+g: create gpt disklabel
+d: delete partition
+n: create partition
+t: set partition type
+w: write
+
+EFI partition:
+- partition number: 1
+- first sector: 
+- last sector: +256M
+
+t
+- partition: 1
+- partition type: 1 (EFI)
+
+
+swap partition:
+- partition number: 2
+- first sector: 
+- last sector: +4G
+
+t
+- partition number: 2
+- partition type: 19 (Linux Swap)
+
+root partition:
+- partition number: 3
+- first sector: 
+- last sector: (enter to take remaining disk space)
+
+(partition type: Linux filesystem)
+
+p (verify partitions)
+w
+
+- mkfs.vfat -F 32 /dev/nvme0n1p1
+- mkfs.ext4 /dev/nvme0n1p3
+- mkswap /dev/nvme0n1p2
+- swapon /dev/nvme0n1p2
+- mount /dev/nvme0n1p3 /mnt/gentoo
+- date (verify date correspond to UTC time)
+- date MMDDhhmmYYYY (manual config: does not use time server)
+- cd /mnt/gentoo
+- links https://www.gentoo.org/downloads/mirrors/
+d (download tarball releases/amd64/autobuilds
+  /YYYYMMDDThhmmssZ/stage3-amd64-openrc-YYYYMMDDThhmmssZ)
+q
+(optional: verify integrity of tarball: check gentoo wiki)
+- tar xpvf stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner
+- vi /mnt/gentoo/etc/portage/make.conf
+    COMMON_FLAGS="-march=native -O2 -pipe"
+    MAKEOPTS="-j2"
+- mirrorselect -i -o >> /mnt/gentoo/etc/portage/make.conf
+- mkdir --parents /mnt/gentoo/etc/portage/repos.conf
+- cp /mnt/gentoo/usr/share/portage/config/repos.conf 
+    /mnt/gentoo/etc/portage/repos.conf/gentoo.conf
+- cp --dereference /etc/resolv.conf /mnt/gentoo/etc/
+- mount --types proc /proc /mnt/gentoo/proc
+- mount --rbind /sys /mnt/gentoo/sys
+- mount --make-rslave /mnt/gentoo/sys
+- mount --rbind /dev /mnt/gentoo/dev
+- mount --make-rslave /mnt/gentoo/dev
+- mount --bind /run /mnt/gentoo/run
+- mount --make-slave /mnt/gentoo/run 
+- chroot /mnt/gentoo /bin/bash
+- source /etc/profile
+- export PS1="(chroot) ${PS1}"
+- mount /dev/nvme0n1p1 /boot
+- emerge-webrsync
+- emerge --sync
+- eselect news list (?)
+- eselect news read (?)
+- eselect profile list
+- eselect profile set <profile_number> (to change profile used)
+- emerge --ask --verbose --update --deep --newuse @world
+- mkdir /etc/portage/package.license/
+- vi /etc/portage/package.license/kernel
+    sys-kernel/linux-firmware @BINARY-REDISTRIBUTABLE
+    sys-firmware/intel-microcode intel-ucode
+- echo "Europe/Paris" > /etc/timezone
+- emerge --config sys-libs/timezone-data
+- vi /etc/locale.gen
+    en_US ISO-8859-1
+    en_US.UTF-8 UTF-8
+- locale-gen
+- locale -a
+- eselect locale list
+- eselect locale set <locale_number>
+- env-update && source /etc/profile && export PS1="(chroot) ${PS1}" 
+  (reload the environment)
+- emerge --ask sys-kernel/linux-firmware
+- emerge --ask sys-firmware/intel-microcode (intel cpu)
+- emerge --ask sys-kernel/gentoo-sources
+- eselect kernel list
+- eselect kernel set <kernel_number>
+- ls -l /usr/src/linux (verify symlink was created)
+# emerge --ask sys-apps/pciutils
+# lspci
+# lsmod
+- cd /usr/src/linux
+- make menuconfig
+    Processor type and features  --->
+    [*] EFI runtime service support 
+    [*]   EFI stub support
+    [ ]     EFI mixed-mode support
+    [*] Built-in kernel command line
+    (root=/dev/nvme0n1p2)
+- make && make modules_install
+- make install
+# blkid
+- vi /etc/fstab
+                                          #noauto instead of defaults
+                                     	  #to mount manually at system
+                            	  #vfat?  #startup (security purpose)
+    /dev/nvme0n1p1   /boot        ext4    defaults,noatime     0 2
+    /dev/nvme0n1p2   none         swap    sw                   0 0
+    /dev/nvme0n1p3   /            ext4    noatime              0 1
+    #/dev/cdrom  /mnt/cdrom   auto    noauto,user          0 0
+- vi /etc/conf.d/hostname
+    hostname="chungus"
+- vi /etc/conf.d/net
+    # Set the dns_domain_lo variable to the selected domain name
+    dns_domain_lo="homenetwork"
+# using dhcpcd
+- emerge --ask net-misc/dhcpcd
+- rc-update add dhcpcd default
+- rc-service dhcpcd start
+# can also use netifrc: view wiki
+- vi /etc/hosts
+    # This defines the current system and must be set
+    127.0.0.1     chungus.homenetwork chungus localhost
+- passwd
+- vi /etc/conf.d/keymaps
+    keymap="fr"
+- vi /etc/conf.d/hwclock
+    clock="local"
+- emerge --ask app-admin/sysklogd
+- rc-update add sysklogd default
+- emerge --ask sys-process/cronie
+- rc-update add cronie default
+- emerge --ask sys-apps/mlocate
+- rc-update add sshd default
+- vi /etc/inittab 
+    # SERIAL CONSOLES
+    s0:12345:respawn:/sbin/agetty 9600 ttyS0 vt100
+    s1:12345:respawn:/sbin/agetty 9600 ttyS1 vt100
+- emerge --ask net-misc/chrony
+- rc-update add chronyd default
+- emerge --ask net-wireless/iw net-wireless/wpa_supplicant
+# using grub bootloader
+- echo 'GRUB_PLATFORMS="efi-64"' >> /etc/portage/make.conf
+- emerge --ask sys-boot/grub
+- grub-install --target=x86_64-efi --efi-directory=/boot --removable
+# emerge --ask sys-boot/os-prober (used to dual boot)
+- grub-mkconfig -o /boot/grub/grub.cfg
+# using no secondary bootloader (other than the system firmware one)
+# - emerge --ask sys-boot/efibootmgr
+# - mkdir -p /boot/efi/boot
+# - cp /boot/vmlinuz-* /boot/efi/boot/bootx64.efi
+# - efibootmgr --create --disk /dev/nvme0n1 --part 2 --label "Gentoo"
+#    --loader "\efi\boot\bootx64.efi"
+- exit
+- cd ; umount -l /mnt/gentoo/dev{/shm,/pts,}
+- umount -R /mnt/gentoo
+- reboot
