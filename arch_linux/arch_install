@@ -74,6 +74,7 @@
 - mkdir -p /home/coco/.config/i3
 - git clone https://github.com/C928/linux-installs
 - cd linux-installs/arch_linux/conf_files
+- tar -xf scripts.tar && rm scripts.tar
 - cp -r config i3blocks i3status scripts ~/.config/i3
 - cp dotfiles/bashrc ~/.bashrc
 - cp dotfiles/kitty.conf ~/.config/kitty/

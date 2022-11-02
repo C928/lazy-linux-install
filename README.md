@@ -1,1 +1,0 @@
-# My personnal linux installations
